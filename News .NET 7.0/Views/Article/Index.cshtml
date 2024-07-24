@@ -1,0 +1,271 @@
+﻿@model News.Models.ArticleViewModel
+
+<head>
+    <link rel="stylesheet" href="~/css/Article/Index.css" asp-append-version="true" />
+</head>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = @Model.Article.Name;
+}
+
+<article>
+    <div class="ShortInfo">
+        <div class="ProduckDetail">
+            <div class="ProduckDetail__Image">
+                @{
+                    string path = "";
+                    path = @Model.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault().Path;
+                }
+                <img src="@path" alt="image1.png">
+            </div>
+
+            <div class="ProduckDetail__Body">
+                <h2 class="ProduckDetail__Title">
+                    @Model.Article.Name
+                </h2>
+
+                <div class="ProduckDetail__Tags">
+                    @foreach (var item in Model.Article.HashTags)
+                    {
+                        string link = $"/article/search/!{item.Name}";
+                        if (Model.Article.HashTags.First() == item)
+                        {
+                            <a href="@link" class="ProduckDetail__Tags-Link">@item.Name</a>
+                        }
+                        else if (Model.Article.HashTags.First() != item)
+                        {
+                            <span>&nbsp,</span>
+                            
+                            <a href="@link" class="ProduckDetail__Tags-Link">@item.Name</a>
+                        }
+                    }
+                </div>
+
+                <div class="ProduckDetail__More">
+                    <span class="ProduckDetail__Date">@Model.Article.Date.ToString("dd/MM/yy HH:mm")</span>
+
+                    <a class="ProduckDetail__UserName" href="/User/userid/@Model.Article.UploadedUser.Id">@Model.Article.UploadedUser.UserName</a>
+
+                    <div class="ProduckDetail__Comments-Count">
+                        <img src="~/resources/Icons/comment.png" />@Model.CommentsCount
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="ArticleContent">
+        @for (int i = 0; i < Model.TextTag.Count; i++)
+        {
+            @switch (Model.TextTag[i].TagName)
+            {
+                case TagName.Text:
+                    <p>@Model.TextTag[i].Value</p>
+                    break;
+                case TagName.Image:
+                    <div class="ArticleContent__Img">
+                        <img src="@Model.TextTag[i].Value" />
+                    </div>
+                    break;
+            }
+        }
+    </div>
+</article>
+
+<div>
+    <ul class="ListComments">
+        <li>
+            <div class="PanelComments">
+            </div>
+        </li>
+    </ul>
+
+    <ul id="list-comments" class="ListComments">
+        @foreach (var item in Model.Article.Comments)
+        {
+            <li class="ViewComments">
+                <div class="ViewComments__Div" data-comment="@item.Id" data-user="@item.UserUploaded.UserName">
+                    <div class="ViewComments__Title">
+                        <div class="ViewComments__Title-Img">
+                            <a href="/User/@item.UserUploaded.Id">
+                                <img src="@item.UserUploaded.AvatarPath" />
+                            </a>
+
+                            <a href="#">@item.UserUploaded.UserName</a>
+                        </div>
+
+                        <div class="ViewComments__Title-Date">
+                            <span class="ViewComments__Date">@item.Date.ToString("dd/MM/yy")</span>
+
+                            <div class="ViewComments__Title-Menu" data-comment="@item.Id">
+                                <a class="VievComments__Title-Menu-A">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="ViewComments__Text">@item.Text</p>
+                </div>
+                @*<div class="ViewComments__Div ViewComments__Title" data-comment="@item.Id">
+                    <div class="ViewComments__Title-Img">
+                        <a href="/User/@item.UserUploaded.Id">
+                            <img src="@item.UserUploaded.AvatarPath" />
+                        </a>
+
+                        <a href="#">@item.UserUploaded.UserName</a>
+                    </div>
+
+                    <div class="ViewComments__Title-Date">
+                        <span class="ViewComments__Date">@item.Date.ToString("dd/MM/yy")</span>
+                        <div class="ViewComments__Title-Menu" >
+                            <a>
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <span class="ViewComments__Text">@item.Text</span>
+                </div>*@
+
+                @foreach (var com in item.ReaplyToComment)
+                {
+                    @if (item.Id != com.Id)
+                    {
+                        <div class="ViewComments__Div ViewReplyCommets" data-comment="@com.Id" data-user="@com.UserUploaded.UserName">
+                            <div class="ViewComments__Title">
+                                <div class="ViewComments__Title-Img">
+                                    <a href="/User/@com.UserUploaded.Id">
+                                        <img src="@com.UserUploaded.AvatarPath" />
+                                    </a>
+
+                                    <a href="#">@com.UserUploaded.UserName</a>
+                                </div>
+
+                                <div class="ViewComments__Title-Date">
+                                    <span class="ViewComments__Date">@com.Date.ToString("dd/MM/yy")</span>
+
+                                    <div class="ViewComments__Title-Menu" data-comment="@item.Id">
+                                        <a class="VievComments__Title-Menu-A">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="ViewComments__Text">@com.Text</p>
+                        </div>
+                    }
+                }
+            </li>
+        }
+
+        <li>
+            <div>
+                <form class="AddComment" asp-action="CreateComment" asp-controller="Article" asp-anti-forgery="true" method="post">
+                    <div class="validation" asp-validation-summary="ModelOnly"></div>
+
+                    <input type="hidden" name="returnUrl" value="@ViewBag.returnUrl" />
+                    <input type="hidden" asp-for="Article.Id" value="@Model.Article.Id" />
+
+                    <textarea cols="50" rows="3" asp-for="AddComment.Text"></textarea>
+                    <input type="submit" value="Коментировать" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    @{
+        PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = $"/Article/{Model.Article.Id}/comments/page/",
+                CountOfObject = Model.CommentsCountOfPage,
+                CountOfObjectViews = Model.NumberOfCommentsView
+            };
+        await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+    }
+</div>
+<script src="~/js/Article/index.js" asp-append-version="true"></script>
+<script>
+    function CreateReplyArea(div, id) {
+        var form = document.createElement("div");
+        form.className = "AddComment";
+        
+
+        var inputReturnUrl = document.createElement("input");
+        inputReturnUrl.type = "hidden";
+        inputReturnUrl.value = "/Article/" + @Model.Article.Id;
+
+        var inputArticleId = document.createElement("input");
+        inputArticleId.type = "hidden";
+        inputArticleId.value = "@Model.Article.Id";
+
+        var inputReplyCommentId = document.createElement("input");
+        inputReplyCommentId.type = "hidden";
+        inputReplyCommentId.value = id;
+
+        var textArea = document.createElement("textarea");
+        textArea.rows = 3;
+        textArea.cols = 50;
+        textArea.textContent = div.dataset.user + ",\r\n";
+
+        var divButtons = document.createElement("div");
+        divButtons.className = "AddCommentDivButtons";
+
+        var inputSubmit = document.createElement("input");
+        inputSubmit.type = "submit";
+        inputSubmit.value = "Коментировать";
+        inputSubmit.onclick = function () {
+            RequestReplyToComment(id, textArea.value, @Model.Article.Id, inputReturnUrl.value);
+        };
+
+        var inputClose = document.createElement("input");
+        inputClose.type = "button";
+        inputClose.value = "Отмена";
+        inputClose.onclick = function() {
+            div.removeChild(form);
+        };
+
+        form.appendChild(inputReturnUrl);
+        form.appendChild(inputArticleId);
+        form.appendChild(inputReplyCommentId);
+        form.appendChild(textArea);
+
+        divButtons.appendChild(inputSubmit);
+        divButtons.appendChild(inputClose);
+        form.appendChild(divButtons);
+
+        div.appendChild(form);
+        textArea.focus();
+        textArea.setSelectionRange(textArea.value.length, textArea.value.length);
+    }
+
+    function RequestReplyToComment(commentId, text, articleId, returnUrl) {
+        var data = new FormData();
+
+        data.append("returnUrl", returnUrl);
+        data.append("ReplyComment.Id", commentId);
+        data.append("AddComment.Text", text);
+        data.append("Article.Id", articleId);
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreateReplyComment", "Article")',
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (result) {
+                window.location.href = returnUrl;
+            },
+            error: function (xhr, status, p3) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+</script>
+@*<script>
+    $(".card").on('click', function(event){
+        window.location.assign("https://localhost:44384/Article?id=" + $(this).attr('data-article'));
+    });
+</script>*@

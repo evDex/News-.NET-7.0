@@ -1,0 +1,147 @@
+﻿@model News.Models.EditArticleViewModel
+<head>
+    <link rel="stylesheet" href="~/css/Article/EditArticle.css" asp-append-version="true" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Редактирование статьи";
+}
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h4>Редактирование</h4>
+        <div>
+            <input id="submitEdit" class="btn btn-primary" type="submit" value="Сохранить" area-hidden="true" />
+            <button class="btn btn-secondary" data-dismiss="modal" area-hidden="true">Закрыть</button>
+        </div>
+    </div>
+    <div class="modal-body">
+
+        <input id="article-id" type="hidden" asp-for="Article.Id" />
+
+        <div id="main-div" class="content">
+
+            <div class="div-short__info">
+
+                <div id="title-img" class="div-img__article">
+                    <img id="blah" class="img-article img-article-title" src="@Model.Article.Files.Where(a => a.Rank == "Title").Select(a => a.Path).FirstOrDefault()" />
+                    <input id="title-input-img" type='file' asp-for="UploadFiles" hidden /> @*onchange="readURL(this);"*@
+                    <input class="input-file__rank" type="hidden" asp-for="FilesRank" name="FilesRank" value="Title" />
+                </div>
+
+                <div class="div-article__info__body">
+                    <textarea id="title-input" class="textarea-article__info__title" cols="50" rows="3" placeholder="Введите заголовок статьи" asp-for="Article.Name"></textarea> @*input_text product-detail__title*@
+
+                    <div class="div-article__info_tags">
+                        <input id="hashTags-input" type="text" asp-for="HashTagsString" placeholder="Введите теги без #" />
+                    </div>
+
+                    <div class="div-article__info__user__and__date">
+                        <span class="span-article__info__date">@Model.Article.Date.ToString("dd/MM/yy HH:mm")</span> @*product-detail__date*@
+                        <a class="a-article__info__upload__user" href="#">@Model.Article.UploadedUser.UserName</a>
+                    </div>
+
+                </div>
+            </div>
+            <div>
+                @for (int i = 0; i < Model.TextTag.Count; i++)
+                {
+                    @switch (Model.TextTag[i].TagName)
+                    {
+                        case TagName.Text:
+                            <input class="input-article__text" type="hidden" value="@Model.TextTag[i].Value" />
+                            break;
+                        case TagName.Image:
+                            <input class="input-img__path" type="hidden" value="@Model.TextTag[i].Value" />
+                            break;
+                    }
+                }
+            </div>
+            <div id="text" class="div-article__detail__body">
+                
+            </div>
+            <div id="add-div-img" class="div-add__article__img">
+                <div class="div-add__article__img__div__attach" onclick="AddTextImg()" title="Добавить изображение">
+                    <img src="~/resources/Icons/attach2.jpg" />
+                </div>
+                <div class="div-add__article__img__div__attach" onclick="AddTextArea()" title="Добавить текстовое поле">
+                    <img src="~/resources/Icons/add-text.png" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/Article/edit.js" asp-append-version="true"></script>
+<script>
+    document.getElementById("submitEdit").addEventListener("click", function (e) {
+        e.preventDefault();
+
+        var data = new FormData();
+
+        data.append("ArticleId", document.getElementById('article-id').value);
+
+        data.append("Title", document.getElementById('title-input').value);
+
+        data.append("HashTagsString", document.getElementById('hashTags-input').value);
+
+
+        var inputsText = document.getElementsByClassName('textarea-article__text');
+
+        var tempText = "";
+        var textNumber = 0;
+        var context = document.getElementById("text").childNodes;
+        for (var i = 0; i < context.length; i++) {
+            if ($(context[i]).data("div-type") === "text") {
+                var s = $(inputsText[textNumber]).val();
+                tempText += " [text] " + s + " [/text] ";
+                textNumber++;
+            }
+            else if ($(context[i]).data("div-type") === "image") {
+                tempText += " [image] [/image] ";            }
+        }
+
+        var inputsFilesRank = document.getElementsByClassName('input-file__rank');
+        var inputsImg = document.getElementsByClassName('input-title__img');
+        var titleImg = document.getElementById('title-input-img').files[0];
+        if (titleImg !== undefined) {
+            data.append("UploadFiles", document.getElementById('title-input-img').files[0]); 
+            data.append("FilesRank", inputsFilesRank[0].value);
+        }
+        for (var i = 0; i < inputsImg.length; i++) {
+            var file = inputsImg[i].files;
+            if (file.length > 0) {
+                if (window.FormData !== undefined) {
+                    for (var x = 0; x < file.length; x++) {
+                        data.append("UploadFiles", file[x]);
+                    }
+                     data.append("FilesRank", inputsFilesRank[i + 1].value);
+                }
+                else {
+                    alert("Браузер не поддерживает загрузку файлов HTML5!");
+                }
+
+            }
+        }
+        data.append("Text", tempText);
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditArticle", "Article")',
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (response) {
+                alert("Статья обновленна");
+            },
+            error: function (xhr, status, p3) {
+                alert(xhr.responseText);
+            }
+        });
+    });
+</script>

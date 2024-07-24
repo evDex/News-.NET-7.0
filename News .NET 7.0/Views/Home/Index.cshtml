@@ -1,0 +1,102 @@
+﻿@model News.Models.ArticlesViewModel
+<head>
+    <link rel="stylesheet" href="~/css/Home/Index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Article/ArticleShortViewCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PageSwitch.css" asp-append-version="true" />
+</head>
+@{
+    ViewData["Title"] = "News";
+
+}
+@*<div>
+    @await Html.PartialAsync(@Url.Action("ListArticles", "Article"), Model)
+</div>*@
+
+
+<div class="user_article">
+    @foreach (var item in Model.Articles)
+    {
+        <article>
+            <div class="card" data-article="@item.Article.Id">
+                <div class="card__header">
+                    <h2 class="card__title">
+                        <a href="@Url.Action("Index","Article")/@item.Article.Id">
+                            <span>@item.Article.Name</span>
+                        </a>
+                    </h2>
+                    <p class="card__description">
+                        @item.TextTag[0].Value
+                    </p>
+                </div>
+                <div class="card__body">
+                    <div class="card__wrap-image">
+                        @if (item.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault() != null)
+                        {
+                            <img class="card__image" src="@item.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault().Path" alt="title_image">
+                        }
+                        else
+                        {
+                            <div id="ImgArticle" style="height:271.5px;width:362px;background-color:black;display: block;margin-left:auto;margin-right:auto;"></div>
+                        }
+                    </div>
+                    <div class="card_date-and-comments">
+                        <span id="DataBottomLeft">@item.Article.Date.ToString("dd/MM/yy")</span>
+                        <span id="DataBottomRight">@item.CommentsCount</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+    }
+</div>
+@{
+    PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = "/page/",
+                CountOfObject = Model.ArticleCount,
+                CountOfObjectViews = Model.NumberOfArticleViews
+            };
+    await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+}
+@*<ul id="ul-pages__switch" class="PageSwitch">
+    @{
+        var numberPage = 1;
+        double maxPages = (double) Model.ArticleCount / Model.NumberOfArticleViews;
+        var url = this.Url.PageLink();
+        if (Int32.TryParse(url.Substring(url.IndexOf("page/") + 5), out _))
+        {
+            numberPage = Int32.Parse(url.Substring(url.IndexOf("page/") + 5));
+        }
+        for (int i = 1; i <= Math.Ceiling(maxPages); i++)
+        {
+            if (numberPage == i)
+            {
+                <li class="PageSwitchLi" style="background-color:#2EA8D7">
+                    <a href="/page/@i" class="PageSwitchLink" style="color:white">
+                        @i
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="PageSwitchLi">
+                    <a href="/page/@i" class="PageSwitchLink">
+                        @i
+                    </a>
+                </li>
+            }
+        }
+        numberPage += 1;
+    }
+
+    @if (numberPage-1 < maxPages)
+    {
+        <li class="PageSwitchLi">
+            <a class="PageSwitchLink" href="/page/@numberPage">
+                <i class="fa fa-arrow-right"></i>
+            </a>
+        </li>
+    }
+</ul>*@
+
+<script src="~/js/Article/article.js" asp-append-version="true"></script>
+<script src="~/js/Home/index.js" asp-append-version="true"></script>

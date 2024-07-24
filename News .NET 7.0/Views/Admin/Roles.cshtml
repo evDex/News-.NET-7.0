@@ -1,0 +1,123 @@
+﻿@model News.Models.ModelCollectionSorted<News.Models.AdminRolesViewModel>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Роли:Админ-панель";
+
+    string SetIconSort(string column)
+    {
+        if (column == Model.ColumnNameOrderBy)
+        {
+            switch (Model.OptionOrderBy)
+            {
+                default:
+                case "ascending":
+                    return "fa fa-sort-down";
+                case "descending":
+                    return "fa fa-sort-up";
+            }
+        }
+        else
+        {
+            return "fa fa-sort";
+        }
+    }
+}
+<head>
+    <link rel="stylesheet" href="~/css/Admin/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Admin/Roles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PageSwitch.css" asp-append-version="true" />
+</head>
+<div>
+    <h1>Админ-панель</h1>
+
+    <ul class="menu">
+        <li>
+            <a asp-action="Articles" asp-controller="Admin">Статьи</a>
+        </li>
+        <li>
+            <a asp-action="Users" asp-controller="Admin">Пользователи</a>
+        </li>
+        <li style="background-color: gray; border-top-right-radius: 8px;border-bottom-right-radius: 8px;">
+            <a asp-action="Roles" asp-controller="Admin">Роли</a>
+        </li>
+    </ul>
+</div>
+<div>
+    <div class="div-nav__roles">
+        <div class="div-search__main">
+            <div class="div-search__container">
+                <form id="search-main-form-admin-articles">
+                    <input id="search-admin-input" type="text" placeholder="Поиск роли..." name="search">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+        <div>
+            <button class="btn-add btn-custom">
+                <i class="fa fa-plus"></i>
+                <span>Добавить роль</span>
+            </button>
+        </div>
+    </div>
+    <div>
+        <table id="admin-table" data-sort="@String.Concat(Model.ColumnNameOrderBy, "_", Model.OptionOrderBy)">
+            <tr>
+                <th id="id-th" class="th-sort">
+                    ID
+                    <i class="@SetIconSort("Id")"></i>
+                </th>
+                <th id="role-name-th" class="th-sort">
+                    Название роли
+                    <i class="@SetIconSort("Name")"></i>
+                </th>
+                <th>Действие</th>
+            </tr>
+
+            @foreach (var role in Model.SortedCollection.Roles)
+            {
+                @if (role.Name == "ChiefAdmin")
+                {
+                    <tr>
+                        <th>@role.Id</th>
+                        <th>
+                            <input value="@role.Name" disabled />
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <th>@role.Id</th>
+                        <th>
+                            <input value="@role.Name" />
+                        </th>
+                        <th>
+                            <div class="div-done__and__delete">
+                                <div class="btn-template btn-done" onclick="ClickDone(this)">
+                                    <img src="/resources/Icons/done.png" />
+                                </div>
+                                <div class="btn-template btn-delete">
+                                    <img src="/resources/Icons/trash.png" />
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
+@{
+    PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = Model.LinkRequest,
+                CountOfObject = Model.SortedCollection.RolesCount,
+                CountOfObjectViews = Model.SortedCollection.NumberOfRolesViews
+            };
+    await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+}
+<script src="~/js/Admin/roles.js" asp-append-version="true"></script>

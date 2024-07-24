@@ -1,0 +1,105 @@
+﻿
+.ContainerUserName span {
+    font-weight: bold;
+    float: left;
+}
+.ContrainerDetailInfo {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+#user_name {
+    font-weight: bold;
+}
+
+.ContainerUserInfo {
+    border: 0;
+    border-radius: 10px;
+    background-color: white;
+    overflow: hidden;
+    width: auto;
+    height: 471px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .ContainerUserInfo p {
+        text-align: center;
+    }
+
+    .ContainerUserInfo img {
+        height: 184px;
+        width: 184px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+#role {
+    min-width: auto;
+    width: auto;
+}
+
+    #role label {
+        border: 1px solid gray;
+        border-radius: 6px;
+        display: inline-block;
+        padding: 5px;
+    }
+    #role p {
+        font-weight: bold;
+    }
+
+.UserArticle {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+    position: relative;
+    grid-auto-rows: auto;
+    z-index: 1;
+    width: 100%;
+    float: none;
+}
+
+.card_edit-and-delete {
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-custom {
+    height: 26px;
+    width: 102px;
+    margin-bottom: 5px;
+    color: black;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+    .btn-custom img {
+        width: 24px;
+        height: 24px;
+    }
+
+
+.btn-delete {
+    background-color: #f44336;
+}
+
+.btn-edit {
+    background-color: #4CAF50;
+}
+
+.btn-add {
+    background-color: #008CBA;
+}
+
+    .btn-add a {
+        text-decoration: none;
+        color: black;
+    }

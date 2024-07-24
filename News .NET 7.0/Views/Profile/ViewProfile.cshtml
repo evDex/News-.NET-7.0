@@ -1,0 +1,91 @@
+﻿@model News.Models.ProfileViewModel
+
+<head>
+    <link rel="stylesheet" href="~/css/Profile/ViewProfile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Article/ArticleShortViewCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PageSwitch.css" asp-append-version="true" />
+</head>
+
+@{
+    List<string> adminRole = new List<string>()
+    {
+        "Admin",
+        "ChiefAdmin"
+    };
+
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Пользователь : " + @Model.User.UserName;
+}
+
+<article>
+    <div class="ContrainerDetailInfo">
+        <div class="ContainerUserInfo">
+            <div>
+                <img src="@Model.User.AvatarPath" alt="UserAvatar" />
+            </div>
+            <br />
+            <div class="ContainerUserName">
+                <p id="user_name">@Model.User.UserName</p>
+                <div>
+                    <p><span>E-mail:&nbsp;</span> @Model.User.Email</p>
+                </div>
+            </div>
+
+            <div id="role" class="form-group">
+                <p>Роли : </p>
+                @foreach (var item in Model.User.Roles)
+                {
+                    <label asp-for="@Model.User.Roles">@item.Name</label>
+                }
+            </div>
+        </div>
+    </div>
+    <div>
+        <h3 style="display:inline-block;">Статьи пользователя</h3>
+        <div class="UserArticle">
+            @foreach (var item in Model.Articles.Articles)
+            {
+                <article>
+                    <div class="card" data-article="@item.Article.Id">
+                        <div class="card__header">
+                            <h2 class="card__title">
+                                <a href="@Url.Action("Index","Article")/@item.Article.Id">
+                                    <span>@item.Article.Name</span>
+                                </a>
+                            </h2>
+                            <p class="card__description">
+                                @item.TextTag[0].Value
+                            </p>
+                        </div>
+                        <div class="card__body">
+                            <div class="card__wrap-image">
+                                @if (item.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault() != null)
+                                {
+                                    <img class="card__image" src="@item.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault().Path" alt="title_image">
+                                }
+                                else
+                                {
+                                    <img class="card__image" src="/resources/UserAvatars/default-avatar.png" alt="title_image">
+                                }
+                            </div>
+                            <div class="card_date-and-comments">
+                                <span id="DataBottomLeft">@item.Article.Date.ToString("dd/MM/yy")</span>
+                                <span id="DataBottomRight">@item.CommentsCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+    @{
+        PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = $"/User/userid/{@Model.User.Id}/articles/page/",
+                CountOfObject = Model.Articles.ArticleCount,
+                CountOfObjectViews = Model.Articles.NumberOfArticleViews
+            };
+        await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+    }
+    
+</article>

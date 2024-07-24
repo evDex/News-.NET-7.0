@@ -1,0 +1,134 @@
+﻿@model News.Models.CreateArticleViewModel
+<head>
+    <link rel="stylesheet" href="~/css/Article/CreateArticle.css" asp-append-version="true" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+</head>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Создание статьи";
+}
+
+<article>
+    <form asp-controller="Article" asp-action="CreateArticle" method="post" enctype="multipart/form-data">
+
+        <div class="div-header__create">
+            <h4>Создание статьи</h4>
+
+            <div>
+                <input id="submit" class="btn btn-primary" type="submit" value="Сохранить" area-hidden="true" />
+            </div>
+        </div>
+
+        <div id="main-div" class="content">
+
+            <div class="div-short__info">
+
+                <div id="title-img" class="div-img__article">
+                    
+                    <img class="img-article" id="blah" /> 
+                    <input id="title-input-img" type='file' asp-for="Files" hidden />
+                    <input class="input-file__rank" type="hidden" asp-for="FilesRank" name="FilesRank" value="Title" />
+                </div>
+                
+                <div class="div-article__info__body"> 
+
+                    <textarea id="title-input" class="textarea-article__info__title" cols="50" rows="3" placeholder="Введите заголовок статьи" asp-for="Title"></textarea> @*input_text product-detail__title*@
+
+                    <div class="div-article__info_tags"> 
+                        <input id="hashTags-input" type="text" asp-for="HashTagsString" placeholder="Введите теги без #" /> 
+                    </div>
+
+                    <div class="div-article__info__user__and__date"> 
+                        <span class="span-article__info__date">@DateTimeOffset.UtcNow.ToLocalTime().ToString("dd/MM/yy HH:mm")</span>
+                        <a class="a-article__info__upload__user" href="#">@User.Identity.Name</a> 
+                    </div>
+
+                </div>
+
+            </div>
+            <div id="text" class="div-article__detail__body"> 
+
+            </div>
+            <div id="add-div-img" class="div-add__article__img">
+                <div class="div-add__article__img__div__attach" onclick="AddTextImg()" title="Добавить изображение">
+                    <img src="~/resources/Icons/attach2.jpg"/>
+                </div>
+                <div class="div-add__article__img__div__attach" onclick="AddTextArea()" title="Добавить текстовое поле">
+                    <img src="~/resources/Icons/add-text.png" />
+                </div>
+            </div>
+        </div>
+
+    </form>
+</article>
+<script charset="utf-8" type="text/javascript" src="~/js/Article/create.js" asp-append-version="true"></script>
+<script>
+    $('#submit').on('click', function (e) {
+        e.preventDefault();
+
+        var data = new FormData();
+
+        data.append("Files", document.getElementById('title-input-img').files[0]);
+
+        data.append("Title", document.getElementById('title-input').value);
+
+        data.append("HashTagsString", document.getElementById('hashTags-input').value);
+
+
+        var inputsImg = document.getElementsByClassName('input-title__img');
+        var inputsText = document.getElementsByClassName('textarea-article__text');
+        var inputsFilesRank = document.getElementsByClassName('input-file__rank');
+        data.append("FilesRank", inputsFilesRank[0].value);
+
+
+        var tempText = "";
+        var textNumber = 0;
+        var context = document.getElementById("text").childNodes;
+        for (var i = 0; i < context.length; i++)
+        {
+            if ($(context[i]).data("div-type") === "text") {
+                tempText += " [text] " + inputsText[textNumber].value + " [/text] ";
+                textNumber++;
+            }
+            else if ($(context[i]).data("div-type") === "image") {
+                tempText += " [image] [/image] ";
+            }
+        }
+        for (var i = 0; i < inputsImg.length; i++) {
+            var file = inputsImg[i].files;
+            if (file.length > 0) {
+                if (window.FormData !== undefined) {
+                    for (var x = 0; x < file.length; x++) {
+                        data.append("Files", file[x]);
+                    }
+                    data.append("FilesRank", inputsFilesRank[i + 1].value);
+                }
+                else {
+                    alert("Браузер не поддерживает загрузку файлов HTML5!");
+                }
+
+            }
+        }
+        data.append("Text", tempText);
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreateArticle", "Article")',
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (result) {
+                alert("Сталья добавлена");
+            },
+            error: function (xhr, status, p3) {
+                alert(xhr.responseText);
+            }
+        });
+    });
+</script>

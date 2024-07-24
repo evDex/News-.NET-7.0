@@ -1,0 +1,134 @@
+﻿@model ProfileViewModel
+<head>
+    <link rel="stylesheet" href="~/css/Profile/Index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Article/ArticleShortViewCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PageSwitch.css" asp-append-version="true" />
+</head>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Личный кабинет";
+    List<string> adminRole = new List<string>()
+    {
+        "Admin",
+        "ChiefAdmin"
+    };
+}
+
+<article>
+    <div class="ContrainerDetailInfo">
+        <div class="ContainerUserInfo">
+            <div>
+                <img src="@Model.User.AvatarPath" alt="UserAvatar" />
+            </div>
+            <br />
+            <div class="ContainerUserName">
+                <p id="user_name">@Model.User.UserName</p>
+                <div>
+                    <p><span>E-mail:&nbsp;</span> @Model.User.Email</p>
+                </div>
+            </div>
+
+            <div id="role" class="form-group">
+                <p>Роли : </p>
+                @foreach (var item in Model.User.Roles)
+                {
+                    <label asp-for="@Model.User.Roles">@item.Name</label>
+                }
+            </div>
+            <a asp-action="ChangeProfile" asp-controller="Profile">Редактировать профиль</a>
+            @if (Model.User.Roles.Select(a => adminRole.Contains(a.Name)).ToList().Find(c => c == true) ? true : false)
+            {
+                <div>
+                    <a asp-action="Articles" asp-controller="Admin">Админ панель</a>
+                </div>
+            }
+        </div>
+    </div>
+    <div>
+        <h3 style="display:inline-block;">Ваши статьи</h3>
+        <button class="btn-template btn-add btn-custom">
+            <a asp-action="CreateArticle" asp-controller="Article">
+                <img src="/resources/Icons/add.png" />Добавить
+            </a>
+        </button>
+        <div class="UserArticle">
+            @foreach (var item in Model.Articles.Articles)
+            {
+                <div class="card" data-article="@item.Article.Id">
+                    <div class="card__header" onclick="ViewArticle(this)">
+                        <p class="card__title">
+                            <h2 class="card__title">
+                                <a href="@Url.Action("Index","Article")/@item.Article.Id">
+                                    <span>@item.Article.Name</span>
+                                </a>
+                            </h2>
+                        </p>
+                        <p class="card__description">
+                            @item.TextTag[0].Value
+                        </p>
+                    </div>
+                    <div class="card__body" onclick="viewArticle(this)">
+                        <div class="card__wrap-image">
+                            @if (item.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault() != null)
+                            {
+                                <img class="card__image" src="@item.Article.Files.Where(a => a.Rank == "Title").FirstOrDefault().Path" alt="title_image">
+                            }
+                            else
+                            {
+                                <img class="card__image" src="/resources/UserAvatars/default-avatar.png" alt="title_image">
+                            }
+                        </div>
+                        <div class="card_date-and-comments">
+                            <span id="DataBottomLeft">@item.Article.Date.ToString("dd/MM/yy")</span>
+                            <span id="DataBottomRight">@item.CommentsCount</span>
+                        </div>
+
+                    </div>
+                    <div class="card_edit-and-delete">
+                        <div>
+                            <a class="btn-template btn-edit btn-custom"><img src="/resources/Icons/edit.png" />Изменить</a>
+                        </div>
+                        <div>
+                            <button class="btn-template btn-delete btn-custom" onclick="deleteArticle(this)"><img src="/resources/Icons/trash.png" />Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <br />
+    
+    @{
+        PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = "/User/articles/page/",
+                CountOfObject = Model.Articles.ArticleCount,
+                CountOfObjectViews = Model.Articles.NumberOfArticleViews
+            };
+        await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+    }
+</article>
+<script>
+    function deleteArticle(event) {
+        var article_id = event.closest(".card");
+        let result = confirm("Уверены что хотите удалить статью: " + article_id.getAttribute('data-article') + "?");
+        if (result) {
+            window.location.assign('@Url.Action("Delete","Article")/' + article_id.getAttribute('data-article'));
+        }
+    }
+    $(function () {
+        $.ajaxSetup({ cache: false });
+        $(".btn-edit").click(function (e) {
+            var article_id = $(this).closest(".card");
+            var h = '@Url.Action("Edit","Article")/' + article_id.attr('data-article');
+
+            e.preventDefault();
+            $.get(h, function (data) {
+                $('#dialogContentXL').html(data);
+                $('#modDialogXL').modal('show');
+            });
+        });
+    })
+</script>
+

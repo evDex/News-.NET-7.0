@@ -1,0 +1,197 @@
+﻿@model News.Models.ModelCollectionSorted<News.Models.AdminUserRolesViewModel>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Пользователи:Админ-панель";
+
+    string SetIconSort(string column)
+    {
+        if (column == Model.ColumnNameOrderBy)
+        {
+            switch (Model.OptionOrderBy)
+            {
+                default:
+                case "ascending":
+                    return "fa fa-sort-down";
+                case "descending":
+                    return "fa fa-sort-up";
+            }
+        }
+        else
+        {
+            return "fa fa-sort";
+        }
+    }
+}
+<head>
+    <link rel="stylesheet" href="~/css/Admin/Admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Admin/Users.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PageSwitch.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+    <link rel="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css" type="text/css" />
+</head>
+<div>
+
+    <h1>Админ-панель</h1>
+
+    <ul class="menu">
+        <li>
+            <a asp-action="Articles" asp-controller="Admin">Статьи</a>
+        </li>
+        <li style="background-color: gray;">
+            <a asp-action="Users" asp-controller="Admin">Пользователи</a>
+        </li>
+        <li>
+            <a asp-action="Roles" asp-controller="Admin">Роли</a>
+        </li>
+    </ul>
+    <div class="MenuRight">
+        <div class="div-search__main">
+            <div class="div-search__container">
+                <form id="search-main-form-admin-articles">
+                    <input id="search-admin-input" type="text" placeholder="Поиск пользаветля..." name="search">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    @{
+        var url = this.Url.PageLink();
+        var numberPage = 1;
+        if (Int32.TryParse(url.Substring(url.IndexOf("page/") + 5), out _))
+        {
+            numberPage = Int32.Parse(url.Substring(url.IndexOf("page/") + 5));
+        }
+    }
+    <table id="admin-table" data-sort="@String.Concat(Model.ColumnNameOrderBy, "_", Model.OptionOrderBy)" data-page="@numberPage">
+        <tr>
+            <th id="id-th">
+                ID
+                <i class="@SetIconSort("Id")"></i>
+            </th>
+            <th>Аватар пользователя</th>
+            <th id="user-name-th">
+                Имя пользователя
+                <i class="@SetIconSort("UserName")"></i>
+            </th>
+            <th id="email-th">
+                E-mail
+                <i class="@SetIconSort("Email")"></i>
+            </th>
+            <th>Роли пользователя</th>
+            <th id="articles-th">
+                Статьи пользователя
+                <i class="@SetIconSort("Articles")"></i>
+            </th>
+            <th>Действие</th>
+        </tr>
+
+        @{
+            foreach (var user in Model.SortedCollection.Users)
+            {
+                <tr class="tr-user__admin__view" data-user="@user.Id">
+                    <th>
+                        @user.Id
+                    </th>
+                    <th>
+                        <img class="img-user__admin__view" src="@user.AvatarPath" alt="UserAvatar" />
+                    </th>
+                    <th>
+                        <a href="/User/userid/@user.Id">@user.UserName</a>
+                    </th>
+                    <th>
+                        @user.Email
+                    </th>
+                    <th class="div-roles__select">
+                        <select class="select_roles" multiple="multiple">
+                            @{
+                                var selectedRoles = new List<string>();
+                                foreach (var userRole in user.Roles)
+                                {
+                                    if (userRole.Name == "ChiefAdmin")
+                                    {
+                                        <option value="@userRole.Name" selected disabled>@userRole.Name</option>
+                                    }
+                                    else if (Model.SortedCollection.Roles.Where(a => a.Name == userRole.Name).FirstOrDefault() != null)
+                                    {
+                                        <option value="@userRole.Name" selected>@userRole.Name</option>
+                                    }
+                                    selectedRoles.Add(userRole.Name);
+                                }
+                                foreach (var role in Model.SortedCollection.Roles)
+                                {
+                                    if (selectedRoles.Where(a => a == role.Name).FirstOrDefault() == null && role.Name != "ChiefAdmin")
+                                    {
+                                        <option value="@role.Name">@role.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </th>
+                    <th class="th-user__articles">
+                        <a href="/User/userid/@user.Id">@user.Articles.Count</a>
+                    </th>
+                    <th>
+                        <div class="div-done__and__delete">
+                            <div class="btn-template btn-done">
+                                <img src="/resources/Icons/done.png"/>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            }
+        }
+    </table>
+</div>
+@{
+    PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = Model.LinkRequest,
+                CountOfObject = Model.SortedCollection.UsersCount,
+                CountOfObjectViews = Model.SortedCollection.NumberOfUsersView
+            };
+    await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+}
+
+<script charset="utf-8" type="text/javascript" src="~/js/Admin/users.js" asp-append-version="true"></script>
+<script>
+    $(document).ready(function () {
+        $('.select_roles').multiselect();
+        var btnsDone = document.getElementsByClassName('btn-done');
+        for (var i = 0; i < btnsDone.length; i++) {
+            btnsDone[i].addEventListener("click", function (event) {
+                event.preventDefault();
+                UpdateUserRoles(event);
+            });
+        }
+    });
+    function UpdateUserRoles(btn) {
+        var tr = btn.target.closest('.tr-user__admin__view');
+        var select = tr.querySelector('.select_roles');
+        var selectValues = getSelectValues(select);
+
+        var data = new FormData();
+        for (var i = 0; i < selectValues.length; i++) {
+            data.append("RoleNames", selectValues[i]);
+        }
+        data.append("UserId", tr.getAttribute('data-user'));
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditUserRoles", "Admin")',
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (result) {
+                alert("Пользователь обновлен");
+            },
+            error: function (xhr, status, p3) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+</script>

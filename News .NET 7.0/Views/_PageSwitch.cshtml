@@ -1,0 +1,45 @@
+﻿@model News.Models.PageSwitch
+
+<ul id="ul-pages__switch" class="PageSwitch">
+    @{
+        var numberPage = 1;
+        double maxPages = (double)Model.CountOfObject / Model.CountOfObjectViews;
+        var url = this.Url.PageLink();
+
+
+        if (Int32.TryParse(url.Substring(url.IndexOf("page/") + 5), out _))
+        {
+            numberPage = Int32.Parse(url.Substring(url.IndexOf("page/") + 5));
+        }
+        for (int i = 1; i <= Math.Ceiling(maxPages); i++)
+        {
+            var link = $"{Model.Link}{i}";
+            if (numberPage == i)
+            {
+                <li class="PageSwitchLi" style="background-color:#2EA8D7">
+                    <a href="@link" class="PageSwitchLink" style="color:white">
+                        @i
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="PageSwitchLi">
+                    <a href="@link" class="PageSwitchLink">
+                        @i
+                    </a>
+                </li>
+            }
+        }
+        numberPage += 1;
+    }
+
+    @if (numberPage - 1 < maxPages)
+    {
+        <li class="PageSwitchLi">
+            <a class="PageSwitchLink" href="/page/@numberPage">
+                <i class="fa fa-arrow-right"></i>
+            </a>
+        </li>
+    }
+</ul>

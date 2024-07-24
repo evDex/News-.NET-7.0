@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - News</title>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script><!--подключение jquery-->
+    @RenderSection("Scripts", required: false)      <!--подключение скриптов валидации после jquery-->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @*<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">*@
+    <script src="https://kit.fontawesome.com/265dda6957.js" crossorigin="anonymous"></script>
+
+    @{
+        ViewBag.Title = "News";
+    }
+</head>
+
+<body>
+    <header>
+        <div class="div-nav">
+            <a class="a-nav__title" href="\"><i class="fa fa-newspaper-o"></i>@ViewBag.Title</a>
+            <form id="search-main-form" class="div-nav__seartch">
+                <div id="search-form" class="form-nav__searh">
+                    <input id="search-input" class="input-nav__search" placeholder="Поиск по сайту" title="Поиск по названию статьи. &#013;Поиск статей пользователя: @@Имя пользователя. &#013;Поиск хеш тегу: #Название тега" type="text" />
+                    <button class="input-nav__search__submit" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <ul class="ul-nav__account">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li>
+                        <a asp-controller="Profile" asp-action="Index">Добро пожаловать @User.Identity.Name</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Account" asp-action="Logout">Выйти</a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a class="loginModal" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Войти</a>
+                    </li>
+                    <li>
+                        <a class="registerModal" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Context.Request.Path">Регистрация</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <div id="modDialog" class="modal fade">
+        <div id="dialogContent" class="modal-dialog"></div>
+    </div>
+
+    <div id="modDialogXL" class="modal fade bd-example-modal-xl" data-backdrop="static">
+        <div id="dialogContentXL" class="modal-dialog modal-xl">
+        </div>
+    </div>
+
+    <footer>
+        <div>
+            &copy; 2022 - News
+        </div>
+    </footer>
+</body>
+</html>
+<script charset="utf-8" type="text/javascript" src="~/js/site.js" asp-append-version="true"></script>

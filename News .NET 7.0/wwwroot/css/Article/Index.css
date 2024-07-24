@@ -1,0 +1,273 @@
+﻿article {
+    background-color: white;
+    margin-bottom: 10px;
+}
+
+.ShortInfo {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.ProduckDetail {
+    height: auto;
+    display: flex;
+    padding: 15px;
+}
+
+.ProduckDetail__Image {
+    max-width: 362px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+    .ProduckDetail__Image img {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+.ProduckDetail__Body {
+    display: flex;
+    flex-direction: column;
+}
+.ProduckDetail__Title {
+    width: 100%;
+    height: 100%;
+    font-size: 32px;
+    word-break: break-word;
+}
+
+.ProduckDetail__Tags {
+    color: #94A9CF;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+    .ProduckDetail__Tags::before {
+        content: "#";
+        margin: 0 .25em 0 0;
+    }
+
+.ProduckDetail__Tags-Link {
+    text-decoration: none;
+    color: #949DB0;
+}
+
+.ProduckDetail__More {
+    display: flex;
+}
+.ProduckDetail__Date {
+    margin-right: 20px;
+}
+
+.ProduckDetail__UserName {
+    color: #949DB0;
+    text-decoration: none;
+    flex-grow: 1;
+}
+
+    .ProduckDetail__UserName:hover {
+        text-decoration: underline;
+    }
+
+.ProduckDetail__Comments-Count {
+    display: flex;
+}
+
+    .ProduckDetail__Comments-Count img {
+        width: 24px;
+        height: 24px;
+    }
+
+.ArticleContent {
+    padding: 15px;
+}
+
+    .ArticleContent p {
+        display: block;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        text-align: justify;
+    }
+
+.ArticleContent__Img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ListComments {
+    display: block;
+    list-style-type: none;
+}
+
+.PanelComments {
+    width: 100%;
+    height: 54px;
+    border: 0px;
+    border-radius: 3px;
+    background-color: gray;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.ViewComments {
+    background-color: white;
+    border: 0px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.ViewComments__Div {
+    
+}
+
+.ViewComments__Title {
+    display: flex;
+    vertical-align: middle;
+}
+.ViewComments__Title-Img {
+    text-align:left;
+    width:90%;
+}
+    .ViewComments__Title-Img a {
+        font-weight: 600;
+        color: black;
+        text-decoration: none;
+    }
+
+    .ViewComments__Title img {
+        width: 24px;
+        height: 24px;
+        margin: 10px;
+    }
+
+.ViewComments__Title-Date {
+    text-align:right;
+    margin: 5px;
+    display:flex;
+}
+
+.ViewReplyCommets {
+    background-color: #EEEFF1;
+    margin-left: 20px;
+}
+
+.ViewComments__Title-Menu {
+    margin-left: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    cursor: pointer;
+    color:gray;
+}
+
+    .ViewComments__Title-Menu a {
+        color:gray;
+        text-decoration: none;
+    }
+
+.ViewComments__Text {
+    margin: 10px;
+    white-space: pre-line;
+}
+
+.AddComment {
+}
+
+    .AddComment textarea {
+        padding: 10px;
+        width: 100%;
+        outline: none;
+    }
+
+    .AddComment input {
+        width: 100%;
+    }
+
+.AddCommentDivButtons {
+    display:flex;
+}
+
+.PageSwitch {
+    display: flex;
+    font-size: 24px;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    list-style: none;
+}
+
+    .PageSwitch li {
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+.PageSwitchLi:hover {
+    background-color: #2EA8D7;
+    color: white;
+}
+
+    .PageSwitchLi:hover .PageSwitchLink {
+        color: white;
+    }
+
+.PageSwitchLi a {
+    color: black;
+    min-width: 36px;
+    text-decoration: none;
+}
+
+.ContextMenu__Reply {
+    position: absolute;
+    cursor:pointer;
+}
+
+.ContextMenu {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    background-color: #fff;
+    /*box-shadow: 0 10px 20px rgb(64 64 64 / 5%);*/
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 10px 0;
+    list-style:none;
+
+}
+
+    .ContextMenu > li > a {
+        font: inherit;
+        border: 0;
+        padding: 10px 30px 10px 15px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        text-decoration: unset;
+        color: #000;
+        font-weight: 500;
+        transition: 0.5s linear;
+        -webkit-transition: 0.5s linear;
+        -moz-transition: 0.5s linear;
+        -ms-transition: 0.5s linear;
+        -o-transition: 0.5s linear;
+        color: black;
+    }
+
+        .ContextMenu > li > a:hover {
+            background: #f1f3f7;
+            color: #4b00ff;
+        }
+
+        .ContextMenu > li > a > i {
+            color: black;
+            padding-right: 10px;
+        }
+
+
+

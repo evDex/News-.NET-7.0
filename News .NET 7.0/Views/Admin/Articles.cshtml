@@ -1,0 +1,211 @@
+﻿@model ModelCollectionSorted<ArticlesViewModel>
+
+<head>
+    <link rel="stylesheet" href="~/css/Admin/Admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PageSwitch.css" asp-append-version="true" />
+</head>
+
+@{
+    var error = TempData["Error"] as string;
+    ViewData["Title"] = "Статьи:Админ-панель";
+
+    string SetIconSort(string column)
+    {
+        if (column == Model.ColumnNameOrderBy)
+        {
+            switch (Model.OptionOrderBy)
+            {
+                default:
+                case "ascending":
+                    return "fa fa-sort-down";
+                case "descending":
+                    return "fa fa-sort-up";
+            }
+        }
+        else
+        {
+            return "fa fa-sort";
+        }
+    }
+}
+
+<div>
+    <h1>Админ-панель</h1>
+
+    <div class="MainDiv__Menu">
+        <div>
+            <ul class="menu">
+                <li style="background-color: gray; border-top-left-radius: 8px;border-bottom-left-radius: 8px;">
+                    <a asp-action="Articles" asp-controller="Admin">Статьи</a>
+                </li>
+                <li>
+                    <a asp-action="Users" asp-controller="Admin">Пользователи</a>
+                </li>
+                <li>
+                    <a asp-action="Roles" asp-controller="Admin">Роли</a>
+                </li>
+            </ul>
+        </div> 
+    </div>
+    <div class="MenuRight">
+        @*<form id="search-main-form-admin-articles" class="div-admin-articles__seartch">
+        <div id="search-admin-form" class="form-admin-articles__searh">
+        <input id="search-admin-input" class="input-admin-articles__search" placeholder="Поиск статьи" type="text" />
+        <button class="input-admin-articles__search__submit" type="submit">
+        <i class="fa fa-search"></i>
+        </button>
+        </div>
+        </form>*@
+        <div class="div-search__main">
+            <div class="div-search__container">
+                <form id="search-main-form-admin-articles">
+                    <input id="search-admin-input" type="text" placeholder="Поиск статьи..." name="search">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    @{
+        var url = this.Url.PageLink();
+        var numberPage = 1;
+        if (Int32.TryParse(url.Substring(url.IndexOf("page/") + 5), out _))
+        {
+            numberPage = Int32.Parse(url.Substring(url.IndexOf("page/") + 5));
+        }
+    }
+    <table id="admin-table" data-sort="@String.Concat(Model.ColumnNameOrderBy, "_", Model.OptionOrderBy)" data-page="@numberPage">
+        <tr>
+            <th id="id-th">
+                ID
+                <i class="@SetIconSort("Id")"></i>
+            </th>
+            <th id="article-name-th">
+                Заголовок статьи
+                <i class="@SetIconSort("Name")"></i>
+            </th>
+            <th id="user-name-th">
+                Пользователь
+                <i class="@SetIconSort("UserName")"></i>
+            </th>
+            <th id="number-of-views-th">
+                Количество просмотров
+                <i class="@SetIconSort("NumberOfViews")"></i>
+            </th>
+            <th id="comments-th">
+                Количество коментариев
+                <i class="@SetIconSort("Comments")"></i>
+            </th>
+            <th id="date-th">
+                Дата загрузки
+                <i class="@SetIconSort("Date")"></i>
+            </th>
+            <th id="state-th">
+                Статус
+                <i class="@SetIconSort("State")"></i>
+            </th>
+            <th>Действие</th>
+        </tr>
+
+        @foreach (var item in Model.SortedCollection.Articles)
+        {
+            <tr class="article_row" data-article="@item.Article.Id">
+                <th>
+                    @item.Article.Id
+                </th>
+                <th>
+                    <a href="@Url.Action("Index","Article")/@item.Article.Id">
+                        @item.Article.Name
+                    </a>
+                </th>
+                <th>
+                    @item.Article.UploadedUser.UserName
+                </th>
+                <th>
+                    @item.Article.NumberOfViews
+                </th>
+                <th>
+                    @item.CommentsCount
+                </th>
+                <th>
+                    @item.Article.Date.ToString("HH:mm dd/MM/yyyy")
+                </th>
+                <th>
+                    <select onchange="SelectChoise(this)">
+                        @if (item.Article.State)
+                        {
+                            <option value="true" selected>Одобренно</option>
+                            <option value="false">Не одобренно</option>
+                        }
+                        else
+                        {
+                            <option value="true">Одобренно</option>
+                            <option value="false" selected>Не одобренно</option>
+                        }
+                    </select>
+                </th>
+                <th>
+                    <div class="div-done__and__delete">
+                        <div class="btn-template btn-done" onclick="ClickDone(this)">
+                            <img src="/resources/Icons/done.png" />
+                        </div>
+                        <div class="btn-template btn-delete">
+                            <img src="/resources/Icons/trash.png" />
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        }
+    </table>
+</div>
+@{
+    PageSwitch pageSwitch = new PageSwitch()
+            {
+                Link = Model.LinkRequest,
+                CountOfObject = Model.SortedCollection.ArticleCount,
+                CountOfObjectViews = Model.SortedCollection.NumberOfArticleViews
+            };
+    await Html.RenderPartialAsync("../_PageSwitch", pageSwitch);
+}
+<script charset="utf-8" type="text/javascript" src="~/js/Admin/articles.js" asp-append-version="true"></script>
+<script>
+    function SelectChoise(e) 
+    {
+        $(e).closest("tr").data("state", e.value);
+    }
+    function ClickDone(e)
+    {
+        var data = new FormData();
+
+        data.append("ArticleId", $(e).closest("tr").data("article"));
+
+        data.append("State", $(e).closest("tr").data("state"));
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditArticle", "Article")',
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (result) {
+                alert("Статья обновленна");
+            },
+            error: function (xhr, status, p3) {
+                alert(xhr.responseText);
+            }
+        });
+
+    }
+    $(function () {
+        $(".btn-delete").click(function (e) {
+            var article_id = $(this).closest(".article_row");
+            var h = '@Url.Action("Delete","Article")/' + article_id.attr('data-article');
+            let result = confirm("Уверены что хотите удалить статью: " + article_id.attr('data-article') + "?");
+            if (result) {
+                window.location.assign('/Article/Delete/' + article_id.getAttribute('data-article'));
+            }
+        });
+    })
+</script>

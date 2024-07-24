@@ -1,0 +1,33 @@
+﻿.PageSwitch {
+    display: flex;
+    font-size: 24px;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    list-style: none;
+}
+
+    .PageSwitch li {
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+.PageSwitchLi:hover {
+    background-color: #2EA8D7;
+    color: white;
+}
+
+    .PageSwitchLi:hover .PageSwitchLink {
+        color: white;
+    }
+
+.PageSwitchLi a {
+    color: black;
+    min-width: 36px;
+    text-decoration: none;
+    padding:10px;
+} 
+

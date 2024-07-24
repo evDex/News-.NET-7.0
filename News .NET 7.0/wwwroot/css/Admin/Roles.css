@@ -1,0 +1,26 @@
+﻿.div-nav__roles {
+    display:flex;
+    justify-content:space-between;
+}
+
+
+
+.btn-custom {
+    border: none;
+    outline: none;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    font-size: 17px;
+    padding: 6px 10px;
+    color: white;
+    line-height: normal;
+    border-radius:5px;
+
+}
+.btn-add {
+    background-color: #008CBA;
+}
+
+
+

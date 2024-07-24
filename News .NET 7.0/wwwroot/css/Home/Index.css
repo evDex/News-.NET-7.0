@@ -1,0 +1,12 @@
+﻿.user_article {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+    position: relative;
+    grid-auto-rows: auto;
+    z-index: 1;
+    width: 100%;
+    float: none;
+}
+
+
