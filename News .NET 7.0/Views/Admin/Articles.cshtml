@@ -183,6 +183,8 @@
 
         data.append("State", $(e).closest("tr").data("state"));
 
+        console.log('@Url.Action("EditArticle", "Article")');
+
         $.ajax({
             type: "POST",
             url: '@Url.Action("EditArticle", "Article")',

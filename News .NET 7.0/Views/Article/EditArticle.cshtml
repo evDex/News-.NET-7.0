@@ -90,7 +90,6 @@
 
         data.append("HashTagsString", document.getElementById('hashTags-input').value);
 
-
         var inputsText = document.getElementsByClassName('textarea-article__text');
 
         var tempText = "";
@@ -128,15 +127,16 @@
 
             }
         }
+        
         data.append("Text", tempText);
 
         $.ajax({
             type: "POST",
-            url: '@Url.Action("EditArticle", "Article")',
+            url: '/Article/Edit',
             contentType: false,
             processData: false,
             data: data,
-            success: function (response) {
+            success: function (result) {
                 alert("Статья обновленна");
             },
             error: function (xhr, status, p3) {
